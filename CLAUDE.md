@@ -2,7 +2,7 @@
 
 ## Purpose
 This folder has two tools:
-1. **Project Maker** — scaffolds a new Claude-optimized project folder with three context files
+1. **Project Maker** — scaffolds a new Claude-optimized project folder with context files
 2. **Prompt Maker** — interviews you to build a well-structured, copy-pasteable prompt
 
 Trigger words:
@@ -11,94 +11,101 @@ Trigger words:
 
 ---
 
-When the user says anything like "make a new project", "new project", "create a project", or "start a project" — follow the New Project Interview Protocol below exactly.
-
----
-
 ## New Project Interview Protocol
 
 Ask each question ONE AT A TIME. Wait for the answer before moving to the next.
-Do not list all questions upfront. Do not number them or hint at what's coming.
-Keep your questions short and conversational.
+Do not list all questions upfront. Keep it conversational.
 
 ### Question 1 — Name
 > "What's the name of this project?"
 
-### Question 2 — Type
-> "What type of project is this?"
+### Question 2 — What are you building?
+> "What is this project? 2–3 sentences — what it does, who it's for, where you are in the process."
 
-After they answer, silently classify it using the Prompt Strategy Table:
-- **Simple task** → Task only (minimal CLAUDE.md)
-- **Creative** → Identity + Constraints + Output Format
-- **Complex** → All five sections
-- **Ongoing project** → Identity + Context in files; Task + Constraints go in each prompt
+Focus on the work, not how Claude should behave. This goes into CONTEXT.md.
 
-If unclear, ask: "Is this a one-off task, an ongoing project, or something more complex?"
+### Question 3 — Modes of work
+> "What are the different modes of work in this project? For example: writing, building, publishing — or research, drafting, review."
 
-### Question 3 — Identity
-> "Who should I be for this project? Describe the role, expertise, tone, and perspective you want."
+Use their answer to define workspaces. Rules:
+- **1 mode** → no workspaces, just root-level files
+- **2–3 modes** → one folder per mode, each gets its own CONTEXT.md
+- **4+ modes** → push back: "Which two or three are the main ones? Start with those — you can always add more."
 
-Examples to suggest if they're stuck: "experienced React Native developer", "direct startup advisor", "professional copywriter who avoids jargon".
+Each folder becomes a row in the routing table.
 
-### Question 4 — Context
-> "What are you building? Give me 2–3 sentences — what it does, who it's for, and where you are in the process."
+### Question 4 — Identity
+> "In one line: who should I be for this project? Role and expertise only."
 
-### Question 5 — Constraints
-> "What should I avoid? Any rules, limitations, or things that have gone wrong before."
+Keep this short. One sentence. It goes at the top of CLAUDE.md — not the context file.
+Example: "You are helping Richard build a React Native app for Android."
 
-Examples: "no TypeScript", "plain language only", "always read files before editing", "don't suggest libraries without asking first".
+### Question 5 — Rules
+> "What should I never do or always do in this project? Any hard constraints."
 
-### Question 6 — Output format
-> "What should my output look like by default?"
+Examples: "always read a file before editing", "no TypeScript", "ask before creating new files".
+These go in the Rules section of CLAUDE.md — keep the list short (3–6 bullets max).
 
-Examples: "code only, no explanation", "short bullet points", "full working files with no placeholders", "step-by-step with reasoning".
+### Question 6 — What good looks like
+> "What does a successful output look like? Be specific about format and quality."
 
-### Question 7 — Folder structure
-> "Does this project need specific subfolders? For example: /drafts, /final, /references — or anything specific to your workflow. Say 'none' to skip."
+This goes into each CONTEXT.md under "What good looks like".
+
+### Question 7 — What to avoid
+> "What are the common mistakes or things you don't want in the output?"
+
+This goes into each CONTEXT.md under "What to avoid".
 
 ### Question 8 — References
 > "Any links, docs, examples, or background I should know about? Say 'none' to skip."
 
 ---
 
-## File Generation
+## File Generation Rules
 
-After all answers are collected, generate three files in `C:\dev\<project-name>\`.
-Create the folder if it does not exist. Create any subfolders the user specified in Question 7.
+Generate files in `C:\dev\<project-name>\`. Create the folder if it does not exist.
+Create workspace subfolders based on Question 3.
 
-### CLAUDE.md
+### The generated CLAUDE.md must stay under 50 lines.
+It is a routing file — not a project brief. If content doesn't help Claude navigate, it belongs in a CONTEXT.md.
 
-Template (match this structure exactly):
 ```markdown
 # <project-name>
 
+Last updated: <today's date>
+
 ## Identity
-You are helping <name from Question 3, rewritten as "You are helping Richard with <what you do>">
+<One line from Question 4>
 
 ## Folder Structure
-<From Question 7 — one bullet per folder with a short description of its purpose.>
-<If user said 'none', omit this section entirely.>
+<One bullet per workspace folder, with a one-line description of what work happens there.>
+<If no workspaces, list any root-level files instead.>
+
+## Routing Table
+| Task | Go to | Read |
+|---|---|---|
+<One row per mode of work from Question 3>
+<Example row: | Write content | /drafts | CONTEXT.md |>
 
 ## Rules
 - Read this file first on every new task
-- Ask before creating files outside of the defined folders
-- <Constraints from Question 5, each as a bullet>
+- Ask before creating files outside the defined folders
+<Constraints from Question 5 — bullet list, 3–6 items max>
 - When unsure, ask
 ```
 
-For React Native / Expo projects, also add after the Rules section:
+For React Native / Expo projects, add after Rules:
 ```markdown
 ## Build Workflow
 
 **Edit on:** Windows (`C:\dev\<name>`)
 **Build on:** Ubuntu at `richard@192.168.100.23`
 
-### Build steps (run manually on Ubuntu via SSH)
+### Build (run on Ubuntu via SSH)
 ```bash
 ssh richard@192.168.100.23
 cd ~/dev/<name>
-git pull origin master
-npm install
+git pull origin master && npm install
 bash -i -c 'cd ~/dev/<name>/android && ./gradlew assembleRelease'
 ```
 
@@ -107,42 +114,57 @@ bash -i -c 'cd ~/dev/<name>/android && ./gradlew assembleRelease'
 scp richard@192.168.100.23:~/dev/<name>/android/app/build/outputs/apk/release/app-release.apk "$USERPROFILE/Downloads/<name>-release.apk"
 adb install -r "$USERPROFILE/Downloads/<name>-release.apk"
 ```
-
 **Always bump the version string before every build.**
 ```
 
 ---
 
-### CONTEXT.md
+### CONTEXT.md (one per workspace, or one at root if no workspaces)
 
 ```markdown
-# Current Project
-<Answer from Question 4 — 2–3 sentences>
+Last updated: <today's date>
+
+# <workspace name or project name>
+
+## What we are building
+<Answer from Question 2 — focused on the work: what it is, who it's for, where things stand>
 
 ## What good looks like
-<Answer from Question 6 — described as a positive outcome>
+<Answer from Question 6 — specific about format, quality, and shape of output>
 
 ## What to avoid
-<Answer from Question 5 — bullet list>
+<Answer from Question 7 — bullet list of failure modes and things to skip>
 ```
+
+Spend 80% of this file on the work description. Keep behavioral instructions out of here — they belong in the Rules section of CLAUDE.md.
 
 ---
 
-### REFERENCES.md
+### REFERENCES.md (one at root level, shared across workspaces)
 
 ```markdown
+Last updated: <today's date>
+
 # References
-<Answer from Question 8 — links, examples, notes. If 'none', leave a placeholder comment.>
+
+## Links and docs
+<Answer from Question 8 — or a placeholder comment if none>
+
+## Examples of good work
+<!-- Add examples here as you find them -->
+
+## Notes
+<!-- Running notes on decisions and background -->
 ```
 
 ---
 
 ## After generating
 
-Confirm with:
-> "Done. Project folder created at `C:\dev\<name>`. Open it and run `claude` to start."
+Say:
+> "Done. `C:\dev\<name>` is ready with [list the files created]. Start small — use it for a few days before adding anything. If something's missing, edit the context files directly rather than rebuilding from scratch."
 
-If the user wants to adjust anything, edit the files directly — do not re-run the whole interview.
+If the project only needed one workspace, say so: "You only had one mode of work so I kept it simple — everything is at the root level. Add subfolders when you actually need them."
 
 ---
 
@@ -156,8 +178,6 @@ Do not reveal the full list of questions. Keep it conversational.
 ### Step 1 — The task
 > "What do you want Claude to do? One clear sentence."
 
-This is the core of the prompt. Everything else supports it.
-
 ### Step 2 — Prompt type
 > "Is this a simple one-off task, a creative task, or something complex?"
 
@@ -166,42 +186,37 @@ Silently map their answer:
 - **Creative** → Ask Steps 3, 5, 6.
 - **Complex** → Ask all Steps 3–6.
 
-If unsure, ask one follow-up: "Does Claude need background info to do this well, or is the task self-explanatory?"
+If unsure: "Does Claude need background info to do this well, or is the task self-explanatory?"
 
 ### Step 3 — Identity *(Creative and Complex only)*
-> "Who should Claude be? Describe the role, expertise, and tone."
-
-Examples if stuck: "senior copywriter", "experienced Python developer", "brutally honest startup advisor".
+> "Who should Claude be? One line — role and expertise only."
 
 ### Step 4 — Context *(Complex only)*
 > "What background does Claude need? Paste or describe the relevant info."
 
-This is where source material, data, meeting notes, or product details go. If the user has a lot to paste, tell them: "Paste it after your answer and I'll incorporate it."
+If they have a lot to paste: "Paste it after your answer and I'll incorporate it."
 
 ### Step 5 — Constraints *(Creative and Complex only)*
 > "What should Claude avoid or stay within?"
 
-Examples: "under 100 words", "no jargon", "don't suggest libraries", "avoid passive voice".
-
 ### Step 6 — Output format *(Creative and Complex only)*
 > "What should the output look like? Describe the shape."
 
-Examples: "3-paragraph essay", "bulleted list", "JSON object", "table with columns X, Y, Z", "working code only, no explanation".
+Examples: "3-paragraph essay", "bulleted list", "working code only, no explanation".
 
 ---
 
 ## Prompt Output
 
-After all answers are collected, assemble and output the prompt as a clean block the user can copy and paste directly.
+Output the prompt as clean, natural text the user can copy and paste directly.
+**No markdown headers inside the prompt.** Write it as flowing text.
 
-**Do not use markdown headers inside the prompt.** Write it as natural flowing text — the kind you'd actually paste into a chat.
-
-### Simple prompt output:
+### Simple:
 ```
-[Task sentence from Step 1.]
+[Task sentence.]
 ```
 
-### Creative prompt output:
+### Creative:
 ```
 You are [identity].
 
@@ -209,16 +224,16 @@ You are [identity].
 
 [Constraints as a sentence or short list.]
 
-[Output format description.]
+[Output format.]
 ```
 
-### Complex prompt output:
+### Complex:
 ```
 You are [identity].
 
 [Task sentence].
 
-Context: [background from Step 4 — summarized or reproduced cleanly].
+Context: [background — summarized or reproduced cleanly].
 
 Constraints:
 - [constraint 1]
@@ -227,7 +242,7 @@ Constraints:
 Output format: [format description].
 ```
 
-After outputting the prompt, ask:
+After outputting, ask:
 > "Want to adjust anything — the tone, length, or any section?"
 
-If they say yes, ask what to change and regenerate. Do not re-run the full interview.
+If yes, ask what to change and regenerate. Do not re-run the full interview.

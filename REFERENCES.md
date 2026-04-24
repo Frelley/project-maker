@@ -1,16 +1,18 @@
+Last updated: 2026-04-24
+
 # References
 
 ## Prompt Structure Framework — the five sections
 
 | Section | Purpose |
 |---|---|
-| **Identity** | Define who Claude is: role, expertise, tone, perspective |
+| **Identity** | Who Claude is: role, expertise, tone (one line) |
 | **Task** | The primary action — precise verb + what to do |
 | **Context** | Background info, data, source material Claude needs |
 | **Constraints** | What to avoid: limits, rules, negative boundaries |
-| **Output Format** | The shape of the result: length, structure, style |
+| **Output Format** | Shape of the result: length, structure, style |
 
-## Prompt Strategy Table — which sections to use
+## Prompt Strategy Table
 
 | Type | Sections |
 |---|---|
@@ -21,16 +23,25 @@
 
 ## The three project files
 
-| File | Contains |
-|---|---|
-| `CLAUDE.md` | Identity, Context summary, Constraints, Output Format — who Claude is and how to behave |
-| `CONTEXT.md` | What we're building, what good looks like, what to avoid |
-| `REFERENCES.md` | Links, docs, examples, running notes |
+| File | Job | Rule |
+|---|---|---|
+| `CLAUDE.md` | Routing — where things are and where to go | Keep under 50 lines |
+| `CONTEXT.md` | Project brief — what the work is, what good looks like | 80% about the work, 20% behavior |
+| `REFERENCES.md` | Background — links, examples, running notes | Passive — Claude reads but doesn't act on directly |
+
+## 7 Common Mistakes (from lesson 3.3)
+
+1. **CLAUDE.md too long** — keep it under 50 lines, routing only
+2. **No routing table** — always include task → folder → read table
+3. **Too many workspaces** — start with 2–3, add more only when needed
+4. **Context files describe Claude's personality, not the work** — flip the ratio: 80% work, 20% behavior
+5. **Never updating context files** — treat them like working notes, add "Last updated" header
+6. **Everything in one flat folder** — more than 8–10 files at one level needs subfolders
+7. **Building the whole system before using it** — build the minimum, use it, then grow
+
+## Workspace rule of thumb
+Ask: "Do I shift mental modes between these tasks?" If yes → separate workspace. If no → subfolder inside one workspace.
 
 ## Trigger phrases
-
-- **Project Maker:** "make a new project", "new project", "create a project", "start a project"
-- **Prompt Maker:** "make a prompt", "build a prompt", "prompt maker", "write a prompt"
-
-## Notes
-<!-- Add notes here as the protocols evolve based on use -->
+- **Project Maker:** "make a new project", "new project", "create a project"
+- **Prompt Maker:** "make a prompt", "build a prompt", "write a prompt"
